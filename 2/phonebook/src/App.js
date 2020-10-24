@@ -39,8 +39,32 @@ const PersonForm = ({name, number, nameHandler, numberHandler, submitHandler}) =
         </form>
     )
 
+const Notification = ({message, error}) => {
+    if (message === null) {
+        return null
+    }
+
+    const style = {
+        color: error ? 'red' : 'green',
+        background: 'lightgrey',
+        fontSize: 20,
+        borderStyle: 'solid',
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 10
+    }
+
+    return (
+        <div style={style}>
+            {message}
+        </div>
+    )
+}
+
 const App = () => {
     const [persons, setPersons] = useState([])
+    const [message, setMessage] = useState(null)
+    const [error, setError] = useState(false)
 
     const hook = () => {
         getAll().then(persons => setPersons(persons))
@@ -61,14 +85,22 @@ const App = () => {
 
         if (person) {
             const changedPerson = {...person, number: newNumber}
-            edit(changedPerson).then(changed => setPersons(persons.filter(p => p.id !== person.id).concat(changed)))
+            edit(changedPerson).then(changed => {
+                setMessage(`Changed number for ${changedPerson.name}`)
+                setTimeout(() => setMessage(null), 3000)
+                setPersons(persons.filter(p => p.id !== person.id).concat(changed))
+            })
         } else {
             const newPerson = {
                 name: newName,
                 number: newNumber
             }
 
-            create(newPerson).then(person => setPersons(persons.concat(person)))
+            create(newPerson).then(person => {
+                setMessage(`Added ${person.name}`)
+                setTimeout(() => setMessage(null), 3000)
+                setPersons(persons.concat(person))
+            })
         }
 
         setNewName('')
@@ -77,12 +109,16 @@ const App = () => {
 
     const deletePerson = (id, name) => {
         if (window.confirm(`Delete ${name}?`)) {
-            remove(id).then(status => {
-                if (status === 200) {
-                    setPersons(persons.filter(person => person.id !== id))
-                } else {
-                    console.log('Failed to remove person')
-                }
+            remove(id).then(() => {
+                setPersons(persons.filter(person => person.id !== id))
+
+            }).catch(() => {
+                setError(true)
+                setMessage(`Information of ${name} has already been removed from server`)
+                setTimeout(() => {
+                    setError(false)
+                    setMessage(null)
+                }, 3000)
             })
         }
     }
@@ -98,6 +134,7 @@ const App = () => {
     return (
         <div>
             <h2>Phonebook</h2>
+            <Notification message={message} error={error}/>
             <Filter value={filter} handler={(event) => setFilter(event.target.value)}/>
             <h3>add a new</h3>
             <PersonForm name={newName} nameHandler={handleNameChange} number={newNumber}
