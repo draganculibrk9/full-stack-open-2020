@@ -1,15 +1,19 @@
 import React, {useState, useEffect} from 'react'
-import axios from 'axios'
+import {getAll, create, remove, edit} from './services/phonebook'
 
 const Person = ({name, number}) =>
     (
         <li>{name} {number}</li>
     )
 
-const Persons = ({persons}) =>
+const Persons = ({persons, deleteHandler}) =>
     (
         <ul>
-            {persons.map(p => <Person key={p.name} name={p.name} number={p.number}/>)}
+            {persons.map(p => <span><Person key={p.name} name={p.name} number={p.number}/>
+                <button
+                    onClick={() => deleteHandler(p.id, p.name)}>delete
+                </button>
+            </span>)}
         </ul>
     )
 
@@ -39,11 +43,7 @@ const App = () => {
     const [persons, setPersons] = useState([])
 
     const hook = () => {
-        axios
-            .get('http://localhost:3001/persons')
-            .then(response => {
-                setPersons(response.data);
-            })
+        getAll().then(persons => setPersons(persons))
     }
 
     useEffect(hook, [])
@@ -57,15 +57,33 @@ const App = () => {
 
     const addPerson = (event) => {
         event.preventDefault();
-        if (persons.find(person => person.name === newName)) {
-            alert(`${newName} is already added to phonebook`);
+        const person = persons.find(person => person.name === newName)
+
+        if (person) {
+            const changedPerson = {...person, number: newNumber}
+            edit(changedPerson).then(changed => setPersons(persons.filter(p => p.id !== person.id).concat(changed)))
         } else {
-            setPersons(persons.concat({
+            const newPerson = {
                 name: newName,
                 number: newNumber
-            }));
-            setNewName('');
-            setNewNumber('')
+            }
+
+            create(newPerson).then(person => setPersons(persons.concat(person)))
+        }
+
+        setNewName('')
+        setNewNumber('')
+    }
+
+    const deletePerson = (id, name) => {
+        if (window.confirm(`Delete ${name}?`)) {
+            remove(id).then(status => {
+                if (status === 200) {
+                    setPersons(persons.filter(person => person.id !== id))
+                } else {
+                    console.log('Failed to remove person')
+                }
+            })
         }
     }
 
@@ -85,7 +103,7 @@ const App = () => {
             <PersonForm name={newName} nameHandler={handleNameChange} number={newNumber}
                         numberHandler={handleNumberChange} submitHandler={addPerson}/>
             <h3>Numbers</h3>
-            <Persons persons={personsToShow}/>
+            <Persons persons={personsToShow} deleteHandler={deletePerson}/>
         </div>
     )
 }
