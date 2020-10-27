@@ -9,7 +9,7 @@ const Person = ({name, number}) =>
 const Persons = ({persons, deleteHandler}) =>
     (
         <ul>
-            {persons.map(p => <span><Person key={p.name} name={p.name} number={p.number}/>
+            {persons.map(p => <span key={p.name}><Person name={p.name} number={p.number}/>
                 <button
                     onClick={() => deleteHandler(p.id, p.name)}>delete
                 </button>
