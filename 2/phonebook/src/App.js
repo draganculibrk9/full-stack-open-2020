@@ -81,6 +81,7 @@ const App = () => {
 
     const addPerson = (event) => {
         event.preventDefault();
+
         const person = persons.find(person => person.name === newName)
 
         if (person) {
@@ -89,6 +90,13 @@ const App = () => {
                 setMessage(`Changed number for ${changedPerson.name}`)
                 setTimeout(() => setMessage(null), 3000)
                 setPersons(persons.filter(p => p.id !== person.id).concat(changed))
+            }).catch((error) => {
+                setError(true)
+                setMessage(error.response.data.error)
+                setTimeout(() => {
+                    setError(false)
+                    setMessage(null)
+                }, 3000)
             })
         } else {
             const newPerson = {
@@ -96,10 +104,18 @@ const App = () => {
                 number: newNumber
             }
 
-            create(newPerson).then(person => {
-                setMessage(`Added ${person.name}`)
-                setTimeout(() => setMessage(null), 3000)
-                setPersons(persons.concat(person))
+            create(newPerson)
+                .then(person => {
+                    setMessage(`Added ${person.name}`)
+                    setTimeout(() => setMessage(null), 3000)
+                    setPersons(persons.concat(person))
+                }).catch((error) => {
+                setError(true)
+                setMessage(error.response.data.error)
+                setTimeout(() => {
+                    setError(false)
+                    setMessage(null)
+                }, 3000)
             })
         }
 
