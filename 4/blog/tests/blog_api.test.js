@@ -2,6 +2,8 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 const api = supertest(app)
 
@@ -69,6 +71,26 @@ const newBlogWithoutUrl = {
     likes: 0
 }
 
+const testUser = {
+    username: "test",
+    password: "test",
+    name: "Test Test"
+}
+
+let token
+
+beforeAll(async () => {
+    const user = new User(testUser)
+    const savedUser = await user.save()
+
+    const userForToken = {
+        username: savedUser.username,
+        id: savedUser._id
+    }
+
+    token = jwt.sign(userForToken, process.env.SECRET)
+})
+
 beforeEach(async () => {
     await Blog.deleteMany({})
 
@@ -102,6 +124,7 @@ test('blogs have id', async () => {
 test('new blog is created', async () => {
     let response = await api
         .post('/api/blogs')
+        .set('authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -126,6 +149,7 @@ test('new blog is created', async () => {
 test('default value of likes property is set to zero', async () => {
     const response = await api
         .post('/api/blogs')
+        .set('authorization', `Bearer ${token}`)
         .send(newBlogWithoutLikes)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -139,6 +163,7 @@ test('default value of likes property is set to zero', async () => {
 test('missing title returns bad request', async () => {
     await api
         .post('/api/blogs')
+        .set('authorization', `Bearer ${token}`)
         .send(newBlogWithoutTitle)
         .expect(400)
 })
@@ -146,6 +171,7 @@ test('missing title returns bad request', async () => {
 test('missing url returns bad request', async () => {
     await api
         .post('/api/blogs')
+        .set('authorization', `Bearer ${token}`)
         .send(newBlogWithoutUrl)
         .expect(400)
 })
