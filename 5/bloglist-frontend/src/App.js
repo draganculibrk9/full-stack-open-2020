@@ -1,6 +1,8 @@
-import React, {useState, useEffect} from 'react'
-import Blogs from "./components/Blogs";
-import Notification from "./components/Notification";
+import React, {useState, useEffect, useRef} from 'react'
+import Blogs from "./components/Blogs"
+import Notification from "./components/Notification"
+import Togglable from "./components/Togglable"
+import BlogForm from "./components/BlogForm"
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -10,9 +12,8 @@ const App = () => {
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
     const [message, setMessage] = useState(null)
-    const [title, setTitle] = useState('')
-    const [author, setAuthor] = useState('')
-    const [url, setUrl] = useState('')
+
+    const blogFormRef = useRef()
 
     useEffect(() => {
         setUser(JSON.parse(window.localStorage.getItem('user')))
@@ -20,6 +21,8 @@ const App = () => {
             setBlogs(blogs)
         )
     }, [])
+
+    const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
 
     const handleLogin = async (event) => {
         event.preventDefault()
@@ -59,21 +62,13 @@ const App = () => {
         </form>
     )
 
-    const createBlog = async (event) => {
-        event.preventDefault()
-
+    const createBlog = async (blog) => {
+        blogFormRef.current.toggleVisibility()
         try {
-            await blogService.create({
-                title,
-                author,
-                url
-            }, user.token)
+            await blogService.create(blog, user.token)
 
-            setMessage(`a new blog ${title} by ${author} added`)
+            setMessage(`a new blog ${blog.title} by ${blog.author} added`)
             setTimeout(() => setMessage(null), 3000)
-            setTitle('')
-            setAuthor('')
-            setUrl('')
             setBlogs(await blogService.getAll())
         } catch (exception) {
             setMessage(exception.response.data.error)
@@ -81,24 +76,31 @@ const App = () => {
         }
     }
 
-    const blogsForm = () => (
-        <form onSubmit={createBlog}>
-            <h2>create new</h2>
-            <div>
-                title <input type='text' value={title} name='Title'
-                             onChange={({target}) => setTitle(target.value)}/>
-            </div>
-            <div>
-                author <input type='text' value={author} name='Author'
-                              onChange={({target}) => setAuthor(target.value)}/>
-            </div>
-            <div>
-                url <input type='text' value={url} name='Url'
-                           onChange={({target}) => setUrl(target.value)}/>
-            </div>
-            <button type='submit'>create</button>
-        </form>
-    )
+    const editBlog = async (blog) => {
+        try {
+            await blogService.edit(blog, user.token)
+
+            setMessage(`liked blog ${blog.title} by ${blog.author}`)
+            setTimeout(() => setMessage(null), 3000)
+            setBlogs(await blogService.getAll())
+        } catch (exception) {
+            setMessage(exception.response.data.error)
+            setTimeout(() => setMessage(null), 3000)
+        }
+    }
+
+    const removeBlog = async (blog) => {
+        try {
+            await blogService.remove(blog.id, user.token)
+
+            setMessage(`removed blog ${blog.title} by ${blog.author}`)
+            setTimeout(() => setMessage(null), 3000)
+            setBlogs(await blogService.getAll())
+        } catch (exception) {
+            setMessage(exception.response.data.error)
+            setTimeout(() => setMessage(null), 3000)
+        }
+    }
 
     return (
         user === null
@@ -116,9 +118,11 @@ const App = () => {
                 <br/>
                 <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
                 <br/>
-                {blogsForm()}
+                <Togglable buttonLabel='new blog' ref={blogFormRef}>
+                    <BlogForm createHandle={createBlog}/>
+                </Togglable>
                 <br/>
-                <Blogs blogs={blogs}/>
+                <Blogs blogs={sortedBlogs} editHandle={editBlog} removeHandle={removeBlog}/>
             </>
     )
 }
