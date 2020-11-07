@@ -37,4 +37,4 @@ const remove = (id, token) => {
     return request.then(response => response.data)
 }
 
-export default {getAll, create, edit, remove}
+export default { getAll, create, edit, remove }

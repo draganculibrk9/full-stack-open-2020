@@ -1,8 +1,8 @@
-import React, {useState, useEffect, useRef} from 'react'
-import Blogs from "./components/Blogs"
-import Notification from "./components/Notification"
-import Togglable from "./components/Togglable"
-import BlogForm from "./components/BlogForm"
+import React, { useState, useEffect, useRef } from 'react'
+import Blogs from './components/Blogs'
+import Notification from './components/Notification'
+import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -52,11 +52,11 @@ const App = () => {
         <form onSubmit={handleLogin}>
             <div>
                 username <input type='text' value={username} name='Username'
-                                onChange={({target}) => setUsername(target.value)}/>
+                    onChange={({ target }) => setUsername(target.value)}/>
             </div>
             <div>
                 password <input type='password' value={password} name='Password'
-                                onChange={({target}) => setPassword(target.value)}/>
+                    onChange={({ target }) => setPassword(target.value)}/>
             </div>
             <button type='submit'>Login</button>
         </form>

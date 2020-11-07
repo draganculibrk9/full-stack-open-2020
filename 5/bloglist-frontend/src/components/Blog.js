@@ -1,6 +1,7 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 
-const Blog = ({blog, editHandle, removeHandle}) => {
+const Blog = ({ blog, editHandle, removeHandle }) => {
     const [additionalInfo, setAdditionalInfo] = useState(false)
 
     const toggleAdditionalInfo = () => setAdditionalInfo(!additionalInfo)
@@ -27,7 +28,7 @@ const Blog = ({blog, editHandle, removeHandle}) => {
         window.confirm(`Remove blog ${blog.name} by ${blog.author}`) && removeHandle(blog)
     }
 
-    const displayWhenAdditionalInfo = {display: additionalInfo ? '' : 'none'}
+    const displayWhenAdditionalInfo = { display: additionalInfo ? '' : 'none' }
 
     return (
         <div style={blogStyle}>
@@ -45,6 +46,12 @@ const Blog = ({blog, editHandle, removeHandle}) => {
             </div>
         </div>
     )
+}
+
+Blog.propTypes = {
+    blog: PropTypes.object.isRequired,
+    editHandle: PropTypes.func.isRequired,
+    removeHandle: PropTypes.func.isRequired
 }
 
 export default Blog
