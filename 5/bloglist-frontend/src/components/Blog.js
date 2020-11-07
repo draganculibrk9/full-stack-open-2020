@@ -32,10 +32,10 @@ const Blog = ({ blog, editHandle, removeHandle }) => {
 
     return (
         <div style={blogStyle}>
-            <div>{blog.title} {blog.author} &nbsp;
+            <div className='basicInfo'>{blog.title} {blog.author} &nbsp;
                 <button onClick={toggleAdditionalInfo}>{additionalInfo ? 'hide' : 'view'}</button>
             </div>
-            <div style={displayWhenAdditionalInfo}>
+            <div className='additionalInfo' style={displayWhenAdditionalInfo}>
                 <div>{blog.url} likes {blog.likes} &nbsp;
                     <button onClick={like}>like</button>
                 </div>
