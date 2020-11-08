@@ -49,16 +49,16 @@ const App = () => {
     }
 
     const loginForm = () => (
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleLogin} id='loginForm'>
             <div>
-                username <input type='text' value={username} name='Username'
+                username <input type='text' value={username} name='Username' id='username'
                     onChange={({ target }) => setUsername(target.value)}/>
             </div>
             <div>
-                password <input type='password' value={password} name='Password'
+                password <input type='password' value={password} name='Password' id='password'
                     onChange={({ target }) => setPassword(target.value)}/>
             </div>
-            <button type='submit'>Login</button>
+            <button type='submit' id='loginButton'>Login</button>
         </form>
     )
 

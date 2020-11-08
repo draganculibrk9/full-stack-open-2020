@@ -37,11 +37,11 @@ const Blog = ({ blog, editHandle, removeHandle }) => {
             </div>
             <div className='additionalInfo' style={displayWhenAdditionalInfo}>
                 <div>{blog.url} likes {blog.likes} &nbsp;
-                    <button onClick={like}>like</button>
+                    <button onClick={like} id='likeButton'>like</button>
                 </div>
                 <div>{blog.user.name}</div>
                 <div>
-                    <button onClick={remove}>remove</button>
+                    <button onClick={remove} id='removeButton'>remove</button>
                 </div>
             </div>
         </div>
