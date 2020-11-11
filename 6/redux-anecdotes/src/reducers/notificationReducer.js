@@ -1,9 +1,17 @@
-export const setNotification = (notification) => {
-    return {
-        type: 'SET_NOTIFICATION',
-        notification
+export const setNotification = (notification, duration) => {
+    return async dispatch => {
+        dispatch({
+            type: 'SET_NOTIFICATION',
+            notification
+        })
+
+        setTimeout(() => dispatch({
+            type: 'SET_NOTIFICATION',
+            notification: null
+        }), duration)
     }
 }
+
 
 const reducer = (state = null, action) => {
     switch (action.type) {
