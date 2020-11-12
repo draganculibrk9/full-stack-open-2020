@@ -1,5 +1,7 @@
 export const setNotification = (notification, duration) => {
     return async dispatch => {
+        clearTimeout()
+        
         dispatch({
             type: 'SET_NOTIFICATION',
             notification
