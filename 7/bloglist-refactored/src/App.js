@@ -8,11 +8,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { initializeBlogs, removeBlog as remove, createBlog as create, editBlog as edit } from './reducers/blogReducer'
 import { setNotification } from './reducers/notificationReducer'
 import { setUser } from './reducers/userReducer'
+import Menu from './components/Menu'
+import { Switch, Route } from 'react-router-dom'
+import Users from './components/Users'
+import UserDetails from "./components/UserDetails";
 
 const App = () => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const user = useSelector(state => state.user)
+    const user = useSelector(state => state.users.user)
 
     const blogFormRef = useRef()
 
@@ -20,7 +24,6 @@ const App = () => {
 
     useEffect(() => {
         dispatch(setUser(JSON.parse(window.localStorage.getItem('user'))))
-        dispatch(initializeBlogs())
     }, [dispatch])
 
     const handleLogin = async (event) => {
@@ -36,6 +39,7 @@ const App = () => {
             setPassword('')
 
             window.localStorage.setItem('user', JSON.stringify(user))
+            dispatch(initializeBlogs())
         } catch (exception) {
             dispatch(setNotification(exception.response.data.error, 3000))
         }
@@ -103,12 +107,24 @@ const App = () => {
                 <Notification/>
                 <br/>
                 <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-                <br/>
-                <Togglable buttonLabel='new blog' ref={blogFormRef}>
-                    <BlogForm createHandle={createBlog}/>
-                </Togglable>
-                <br/>
-                <Blogs editHandle={editBlog} removeHandle={removeBlog}/>
+                <Menu/>
+                <Switch>
+                    <Route path='/users/:id'>
+                        <UserDetails/>
+                    </Route>
+                    <Route path='/users'>
+                        <Users/>
+                    </Route>
+                    <Route path='/'>
+                        <div>
+                            <Togglable buttonLabel='new blog' ref={blogFormRef}>
+                                <BlogForm createHandle={createBlog}/>
+                            </Togglable>
+                            <br/>
+                            <Blogs editHandle={editBlog} removeHandle={removeBlog}/>
+                        </div>
+                    </Route>
+                </Switch>
             </>
     )
 }
