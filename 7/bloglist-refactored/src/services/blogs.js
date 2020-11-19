@@ -7,6 +7,21 @@ const getAll = () => {
     return request.then(response => response.data)
 }
 
+const get = (id) => {
+    const request = axios.get(`${baseUrl}/${id}`)
+    return request.then(response => response.data)
+}
+
+const getComments = (id) => {
+    const request = axios.get(`${baseUrl}/${id}/comments`)
+    return request.then(response => response.data)
+}
+
+const postComment = (id, comment) => {
+    const request = axios.post(`${baseUrl}/${id}/comments`, comment)
+    return request.then(response => response.data)
+}
+
 const create = (blog, token) => {
     const request = axios.post(baseUrl, blog, {
         headers: {
@@ -37,4 +52,4 @@ const remove = (id, token) => {
     return request.then(response => response.data)
 }
 
-export default { getAll, create, edit, remove }
+export default { getAll, create, edit, remove, getComments, postComment, get }

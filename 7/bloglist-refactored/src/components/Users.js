@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { initializeUsers } from '../reducers/userReducer'
 import User from './User'
-
+import Table from 'react-bootstrap/Table'
 
 const Users = () => {
     const dispatch = useDispatch()
@@ -14,7 +14,7 @@ const Users = () => {
     const users = useSelector(state => state.users.users.sort((a, b) => b.blogs.length - a.blogs.length))
 
     return (
-        <table>
+        <Table striped>
             <thead>
                 <tr>
                     <td>&nbsp;</td>
@@ -24,7 +24,7 @@ const Users = () => {
             <tbody>
                 {users.map(user => <User key={user.id} id={user.id} name={user.name} blogs={user.blogs.length}/>)}
             </tbody>
-        </table>
+        </Table>
     )
 }
 

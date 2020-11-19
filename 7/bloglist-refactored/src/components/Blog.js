@@ -1,21 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 
-const Blog = ({ blog, editHandle, removeHandle }) => {
-    const [additionalInfo, setAdditionalInfo] = useState(false)
-
-    const toggleAdditionalInfo = () => setAdditionalInfo(!additionalInfo)
-
-    const like = () => {
-        const likedBlog = {
-            ...blog,
-            likes: ++blog.likes,
-            user: blog.user.id
-        }
-
-        editHandle(likedBlog)
-    }
-
+const Blog = ({ blog }) => {
     const blogStyle = {
         paddingTop: 10,
         paddingLeft: 2,
@@ -24,34 +11,15 @@ const Blog = ({ blog, editHandle, removeHandle }) => {
         marginBottom: 5
     }
 
-    const remove = () => {
-        window.confirm(`Remove blog ${blog.name} by ${blog.author}`) && removeHandle(blog)
-    }
-
-    const displayWhenAdditionalInfo = { display: additionalInfo ? '' : 'none' }
-
     return (
         <div style={blogStyle}>
-            <div className='basicInfo'>{blog.title} {blog.author} &nbsp;
-                <button onClick={toggleAdditionalInfo}>{additionalInfo ? 'hide' : 'view'}</button>
-            </div>
-            <div className='additionalInfo' style={displayWhenAdditionalInfo}>
-                <div>{blog.url} likes {blog.likes} &nbsp;
-                    <button onClick={like} id='likeButton'>like</button>
-                </div>
-                <div>{blog.user.name}</div>
-                <div>
-                    <button onClick={remove} id='removeButton'>remove</button>
-                </div>
-            </div>
+            <Link to={`/blogs/${blog.id}`}>{blog.title} {blog.author}</Link>
         </div>
     )
 }
 
 Blog.propTypes = {
-    blog: PropTypes.object.isRequired,
-    editHandle: PropTypes.func.isRequired,
-    removeHandle: PropTypes.func.isRequired
+    blog: PropTypes.object.isRequired
 }
 
 export default Blog

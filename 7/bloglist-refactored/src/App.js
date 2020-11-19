@@ -5,13 +5,17 @@ import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import loginService from './services/login'
 import { useDispatch, useSelector } from 'react-redux'
-import { initializeBlogs, removeBlog as remove, createBlog as create, editBlog as edit } from './reducers/blogReducer'
+import { initializeBlogs, createBlog as create } from './reducers/blogReducer'
 import { setNotification } from './reducers/notificationReducer'
 import { setUser } from './reducers/userReducer'
+import { setUserDetails } from './reducers/userDetailsReducer'
 import Menu from './components/Menu'
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route, useRouteMatch } from 'react-router-dom'
 import Users from './components/Users'
-import UserDetails from "./components/UserDetails";
+import UserDetails from './components/UserDetails'
+import BlogDetails from './components/BlogDetails'
+import { setBlog } from './reducers/blogDetailsReducer'
+import { Button, Form } from 'react-bootstrap'
 
 const App = () => {
     const [username, setUsername] = useState('')
@@ -45,23 +49,22 @@ const App = () => {
         }
     }
 
-    const handleLogout = () => {
-        window.localStorage.clear()
-        dispatch(setUser(null))
-    }
-
     const loginForm = () => (
-        <form onSubmit={handleLogin} id='loginForm'>
-            <div>
-                username <input type='text' value={username} name='Username' id='username'
+        <Form onSubmit={handleLogin} id='loginForm'>
+            <Form.Group>
+                <Form.Label>
+                    username
+                </Form.Label>
+                <Form.Control type='text' value={username} name='Username' id='username'
                     onChange={({ target }) => setUsername(target.value)}/>
-            </div>
-            <div>
-                password <input type='password' value={password} name='Password' id='password'
+                <Form.Label>
+                    password
+                </Form.Label>
+                <Form.Control type='password' value={password} name='Password' id='password'
                     onChange={({ target }) => setPassword(target.value)}/>
-            </div>
-            <button type='submit' id='loginButton'>Login</button>
-        </form>
+                <Button type='submit' id='loginButton'>Login</Button>
+            </Form.Group>
+        </Form>
     )
 
     const createBlog = async (blog) => {
@@ -74,40 +77,25 @@ const App = () => {
         }
     }
 
-    const editBlog = async (blog) => {
-        try {
-            dispatch(edit(blog, user.token))
-            dispatch(setNotification(`liked blog ${blog.title} by ${blog.author}`, 3000))
-        } catch (exception) {
-            dispatch(setNotification(exception.response.data.error, 3000))
-        }
-    }
+    const blogMatch = useRouteMatch('/blogs/:id')
+    blogMatch && dispatch(setBlog(blogMatch.params.id))
 
-    const removeBlog = async (blog) => {
-        try {
-            dispatch(remove(blog.id, user.token))
-            dispatch(setNotification(`removed blog ${blog.title} by ${blog.author}`, 3000))
-        } catch (exception) {
-            dispatch(setNotification(exception.response.data.error, 3000))
-        }
-    }
+    const userMatch = useRouteMatch('/users/:id')
+    userMatch && dispatch(setUserDetails(userMatch.params.id))
 
     return (
         user === null
-            ? <>
+            ? <div className='container'>
                 <h2>log in to application</h2>
                 <br/>
                 <Notification/>
                 <br/>
                 {loginForm()}
-            </>
-            : <>
-                <h2>Blogs</h2>
-                <br/>
+            </div>
+            : <div className='container'>
+                <Menu user={user}/>
+                <h2>Blog app</h2>
                 <Notification/>
-                <br/>
-                <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-                <Menu/>
                 <Switch>
                     <Route path='/users/:id'>
                         <UserDetails/>
@@ -115,17 +103,20 @@ const App = () => {
                     <Route path='/users'>
                         <Users/>
                     </Route>
+                    <Route path='/blogs/:id'>
+                        <BlogDetails/>
+                    </Route>
                     <Route path='/'>
                         <div>
                             <Togglable buttonLabel='new blog' ref={blogFormRef}>
                                 <BlogForm createHandle={createBlog}/>
                             </Togglable>
                             <br/>
-                            <Blogs editHandle={editBlog} removeHandle={removeBlog}/>
+                            <Blogs/>
                         </div>
                     </Route>
                 </Switch>
-            </>
+            </div>
     )
 }
 
