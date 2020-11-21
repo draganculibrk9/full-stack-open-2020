@@ -153,7 +153,7 @@ const resolvers = {
 
             const changedAuthor = {...author, born: args.setBornTo}
 
-            authors = authors.filter(a => a.name !== author.name ? a : changedAuthor)
+            authors = authors.map(a => a.name !== args.name ? a : changedAuthor)
 
             return changedAuthor
         }
