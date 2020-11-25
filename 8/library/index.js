@@ -63,11 +63,18 @@ const typeDefs = gql`
 
 const resolvers = {
     Query: {
-        bookCount: async () => Book.find().count(),
+        bookCount: () => Book.find().count(),
         authorCount: () => Author.find().count(),
-        allBooks: (root, args) => {
-            const filteredByAuthor = args.author ? books.filter(book => book.author === args.author) : books
-            return args.genre ? filteredByAuthor.filter(book => book.genres.includes(args.genre)) : filteredByAuthor
+        allBooks: async (root, args) => {
+            const query = {}
+            if (args.author) {
+                query.author = args.author
+            }
+            if (args.genre) {
+                query.genres = args.genre
+            }
+
+            return Book.find(query).populate('author', {name: 1})
         },
         allAuthors: () => Author.find(),
         me: (root, args, context) => context.currentUser
@@ -84,9 +91,9 @@ const resolvers = {
                 throw new AuthenticationError('Invalid token')
             }
 
-            let author = await Author.find({name: args.author})
+            let author = await Author.findOne({name: args.author})
 
-            if (author.length === 0) {
+            if (!author) {
                 try {
                     author = new Author({name: args.author})
                     author = await author.save()
@@ -137,7 +144,8 @@ const resolvers = {
 
             const userForToken = {
                 username: user.username,
-                id: user._id
+                id: user._id,
+                favouriteGenre: user.favouriteGenre
             }
 
             return {value: jwt.sign(userForToken, process.env.JWT_SECRET)}
