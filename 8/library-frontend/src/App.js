@@ -3,8 +3,9 @@ import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import Login from './components/Login'
-import {useApolloClient} from "@apollo/client";
+import {useApolloClient, useSubscription} from "@apollo/client";
 import Recommendations from "./components/Recommendations";
+import {ALL_BOOKS, BOOK_ADDED} from "./queries";
 
 const App = () => {
     const [page, setPage] = useState('authors')
@@ -14,6 +15,29 @@ const App = () => {
     useEffect(() => {
         setUser(localStorage.getItem('library-token'))
     }, [])
+
+    const updateCacheWith = (addedBook) => {
+        const includedIn = (set, object) => set.map(p => p.id).includes(object.id)
+
+        const dataInStore = client.readQuery({query: ALL_BOOKS})
+        console.log(dataInStore)
+        if (!includedIn(dataInStore.allBooks, addedBook)) {
+            client.writeQuery({
+                    query: ALL_BOOKS,
+                    data: {allBooks: dataInStore.allBooks.concat(addedBook)}
+                }
+            )
+        }
+
+    }
+
+    useSubscription(BOOK_ADDED, {
+        onSubscriptionData: ({subscriptionData}) => {
+            const addedBook = subscriptionData.data.bookAdded
+            window.alert(`${addedBook.title} by ${addedBook.author.name} added`)
+            updateCacheWith(addedBook)
+        }
+    })
 
     const logout = () => {
         setUser(null)
@@ -42,6 +66,7 @@ const App = () => {
 
             <NewBook
                 show={page === 'add'}
+                updateCacheWith={updateCacheWith}
             />
 
             <Login
