@@ -4,26 +4,28 @@ import {ALL_BOOKS} from "../queries";
 import jwt_decode from 'jwt-decode'
 
 const Recommendations = ({show, token}) => {
-    const [loadBooksByGenre, result] = useLazyQuery(ALL_BOOKS,
-        {fetchPolicy: 'no-cache'})
     const [favouriteGenre, setFavouriteGenre] = useState('')
+    const [loadBooksByGenre, {called, loading, data}] = useLazyQuery(ALL_BOOKS,
+        {
+            fetchPolicy: 'network-only',
+            variables: {genre: favouriteGenre}
+        }
+    )
 
     useEffect(() => {
-        if (show) {
+        if (token) {
             setFavouriteGenre(jwt_decode(token).favouriteGenre)
-            loadBooksByGenre({variables: {genre: favouriteGenre}})
+            loadBooksByGenre()
         }
-    }, []) //eslint-disable-line
+    }, [token]) // eslint-disable-line
 
     if (!show) {
         return null
     }
 
-    if (result.called && result.loading) {
+    if (called && loading) {
         return <div>loading...</div>
     }
-
-    console.log(result)
 
     return (
         <div>
@@ -41,7 +43,7 @@ const Recommendations = ({show, token}) => {
                 </tr>
                 </thead>
                 <tbody>
-                {result.data.allBooks.map(a =>
+                {data.allBooks.map(a =>
                     <tr key={a.title}>
                         <td>{a.title}</td>
                         <td>{a.author.name}</td>
