@@ -9,7 +9,7 @@ type Category = 'Very severely underweight' |
 
 const between = (x: number, bottom: number, top: number): boolean => {
     return x > bottom && x <= top;
-}
+};
 
 interface BmiInput {
     height: number;
@@ -36,4 +36,4 @@ export const calculateBMI = (bmiInput: BmiInput): Category => {
     } else {
         return 'Obese Class III (Very severely obese)';
     }
-}
+};

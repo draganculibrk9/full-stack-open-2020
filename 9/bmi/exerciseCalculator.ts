@@ -30,8 +30,8 @@ const parseExerciseCalculatorArguments = (args: string[]): ExerciseCalculatorInp
     return {
         target,
         dailyHours
-    }
-}
+    };
+};
 
 const calculateRating = (dailyHours: number[], target: number): number => {
     const ratio = dailyHours.filter(h => h >= target).length / dailyHours.length;
@@ -43,7 +43,7 @@ const calculateRating = (dailyHours: number[], target: number): number => {
     } else {
         return 3;
     }
-}
+};
 
 const getRatingDescription = (rating: number): RatingDescription => {
     switch (rating) {
@@ -54,7 +54,7 @@ const getRatingDescription = (rating: number): RatingDescription => {
         default:
             return 'excellent';
     }
-}
+};
 
 const calculateExercises = (exerciseCalculatorInput: ExerciseCalculatorInput): Result => {
     const dailyHours = exerciseCalculatorInput.dailyHours;
@@ -69,11 +69,13 @@ const calculateExercises = (exerciseCalculatorInput: ExerciseCalculatorInput): R
         ratingDescription: getRatingDescription(rating),
         target,
         average: dailyHours.reduce((a, b) => a + b, 0) / dailyHours.length
-    }
-}
+    };
+};
 
 try {
     console.log(calculateExercises(parseExerciseCalculatorArguments(process.argv)));
 } catch (e) {
-    console.log('Error: ', e.message);
+    if (e instanceof Error) {
+        console.log('Error: ', e.message);
+    }
 }
