@@ -16,26 +16,7 @@ interface BmiInput {
     weight: number;
 }
 
-const parseBmiCalculatorArguments = (args: string[]): BmiInput => {
-    if (args.length < 4) throw new Error('Not enough arguments');
-    if (args.length > 4) throw new Error('Too many arguments');
-
-    const height = Number(args[2]);
-    const weight = Number(args[3]);
-
-    if (isNaN(height) || isNaN(weight)) {
-        throw new Error('Provided values were not numbers!');
-    } else if (height <= 0 || weight <= 0) {
-        throw new Error('Provided values must be greater than zero!');
-    }
-
-    return {
-        height,
-        weight
-    }
-}
-
-const calculateBMI = (bmiInput: BmiInput): Category => {
+export const calculateBMI = (bmiInput: BmiInput): Category => {
     const bmi = bmiInput.weight / Math.pow((bmiInput.height / 100), 2);
 
     if (between(bmi, 0, 15)) {
@@ -55,10 +36,4 @@ const calculateBMI = (bmiInput: BmiInput): Category => {
     } else {
         return 'Obese Class III (Very severely obese)';
     }
-}
-
-try {
-    console.log(calculateBMI(parseBmiCalculatorArguments(process.argv)));
-} catch (e) {
-    console.log('Error: ', e.message);
 }
