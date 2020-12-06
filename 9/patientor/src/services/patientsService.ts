@@ -23,7 +23,17 @@ const addPatient = (patient: PatientWithoutId): Patient => {
     return newPatient;
 };
 
+const getPatient = (id: string): Patient => {
+    const patient: Patient | undefined = patients.find(p => p.id === id);
+
+    if (patient === undefined) {
+        throw new Error(`Cannot find patient with it ${id}`);
+    }
+    return patient;
+};
+
 export default {
     getPatients,
-    addPatient
+    addPatient,
+    getPatient
 };
