@@ -4,6 +4,7 @@ import {setPatient, useStateValue} from "../state";
 import {Patient} from "../types";
 import {apiBaseUrl} from "../constants";
 import {Container, Icon, StrictIconProps} from "semantic-ui-react";
+import EntryDetails from "./EntryDetails";
 
 const PatientInfoPage: React.FC<{ id: string }> = ({id}) => {
     const [{patient}, dispatch] = useStateValue();
@@ -30,6 +31,11 @@ const PatientInfoPage: React.FC<{ id: string }> = ({id}) => {
                 <h2>{patient?.name} <Icon name={icon}/></h2>
                 <p>ssn: {patient?.ssn}</p>
                 <p>occupation: {patient?.occupation}</p>
+
+                <h3>entries</h3>
+                {patient?.entries.map(entry =>
+                    <EntryDetails key={entry.id} entry={entry}/>
+                )}
             </Container>
         </div>
     );

@@ -4,8 +4,8 @@ import { Route, Link, Switch, useRouteMatch } from "react-router-dom";
 import { Button, Divider, Header, Container } from "semantic-ui-react";
 
 import { apiBaseUrl } from "./constants";
-import {setPatientList, useStateValue} from "./state";
-import { Patient } from "./types";
+import {setDiagnoses, setPatientList, useStateValue} from "./state";
+import {Diagnosis, Patient} from "./types";
 
 import PatientListPage from "./PatientListPage";
 import PatientInfoPage from "./PatientInfoPage";
@@ -14,6 +14,15 @@ const App: React.FC = () => {
   const [, dispatch] = useStateValue();
   React.useEffect(() => {
     axios.get<void>(`${apiBaseUrl}/ping`);
+
+    const fetchDiagnoses = async () => {
+      try {
+        const {data: diagnoses} = await axios.get<Diagnosis[]>(`${apiBaseUrl}/diagnoses`);
+        dispatch(setDiagnoses(diagnoses));
+      } catch (e) {
+        console.error(e);
+      }
+    };
 
     const fetchPatientList = async () => {
       try {
@@ -26,6 +35,7 @@ const App: React.FC = () => {
       }
     };
     fetchPatientList();
+    fetchDiagnoses();
   }, [dispatch]);
 
   const match = useRouteMatch<{id: string}>('/patients/:id');
