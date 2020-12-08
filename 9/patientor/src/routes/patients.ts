@@ -1,7 +1,7 @@
 import express from 'express';
 import patientsService from '../services/patientsService';
-import {toPatientWithoutId} from "../utils";
-import {Patient, PatientWithoutId} from "../types";
+import {toEntryWithoutId, toPatientWithoutId} from "../utils";
+import {Entry, EntryWithoutId, Patient, PatientWithoutId} from "../types";
 
 const router = express.Router();
 
@@ -16,7 +16,12 @@ router.post('/', (req, res) => {
 
         res.json(newPatient);
     } catch (e) {
-        res.sendStatus(400);
+        if (e instanceof Error) {
+            res.status(400)
+                .json({
+                    error: e.message
+                });
+        }
     }
 });
 
@@ -31,6 +36,31 @@ router.get('/:id', (req, res) => {
                 .json({
                     error: e.message
                 });
+        }
+    }
+});
+
+router.post('/:id/entries', (req, res) => {
+    try {
+        const id: string = req.params.id;
+        const entryWithoutId: EntryWithoutId = toEntryWithoutId(req.body);
+        const newEntry: Entry = patientsService.addEntry(id, entryWithoutId);
+
+        res.json(newEntry);
+    } catch (e) {
+        if (e instanceof Error) {
+            if (e.message.includes('find')) {
+                res.status(404)
+                    .json({
+                            error: e.message
+                        }
+                    );
+            } else {
+                res.status(400)
+                    .json({
+                        error: e.message
+                    });
+            }
         }
     }
 });

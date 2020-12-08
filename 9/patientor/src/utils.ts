@@ -1,4 +1,4 @@
-import {Gender, PatientWithoutId} from './types';
+import {EntryWithoutId, Gender, PatientWithoutId} from './types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -11,6 +11,14 @@ export const toPatientWithoutId = (object: any): PatientWithoutId => {
         occupation: parseString(object.occupation),
         entries: []
     };
+};
+
+export const toEntryWithoutId = (object: any): EntryWithoutId => {
+    if (parseString(object.type)) {
+        return object as EntryWithoutId;
+    } else {
+        throw Error('Invalid entry');
+    }
 };
 
 const parseString = (text: any): string => {

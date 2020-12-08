@@ -25,6 +25,12 @@ interface BaseEntry {
     diagnosisCodes?: Array<Diagnosis['code']>;
 }
 
+export enum EntryType {
+    "HealthCheck" = 0,
+    "OccupationalHealthcare" = 1,
+    "Hospital" = 2
+}
+
 interface HealthCheckEntry extends BaseEntry {
     type: "HealthCheck";
     healthCheckRating: HealthCheckRating;
