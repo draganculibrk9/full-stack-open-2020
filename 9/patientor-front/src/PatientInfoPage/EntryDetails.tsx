@@ -53,6 +53,13 @@ const EntryDetails: React.FC<{ entry: Entry }> = ({entry}) => {
                             {entry.employerName}
                         </Header>
                         <i>{entry.description}</i>
+                        <br/>
+                        {entry.sickLeave &&
+                        <span>
+                            <i>Sick leave: </i>
+                            <b>{entry.sickLeave.startDate}-{entry.sickLeave.endDate}</b>
+                        </span>
+                        }
                     </Segment>
                 </Container>
             );

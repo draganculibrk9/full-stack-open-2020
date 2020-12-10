@@ -3,13 +3,16 @@ import axios from "axios";
 import {addEntry, setPatient, useStateValue} from "../state";
 import {Entry, EntryType, Patient} from "../types";
 import {apiBaseUrl} from "../constants";
-import {Container, Icon, StrictIconProps} from "semantic-ui-react";
+import {Container, Divider, Grid, Header, Icon, Segment, StrictIconProps} from "semantic-ui-react";
 import EntryDetails from "./EntryDetails";
 import AddEntryForm from "./AddEntryForm";
-import {NumberField} from "../AddPatientModal/FormField";
-import {Field} from "formik";
 
-type EntryFormValues = Omit<Entry, 'id'>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DistributiveOmit<T, K extends keyof any> = T extends any
+    ? Omit<T, K>
+    : never;
+
+export type EntryFormValues = DistributiveOmit<Entry, 'id'>;
 
 export interface Props {
     onSubmit: (values: EntryFormValues) => void;
@@ -45,7 +48,6 @@ const PatientInfoPage: React.FC<{ id: string }> = ({id}) => {
                 );
                 dispatch(addEntry(patient.id, entry));
             } catch (e) {
-                console.error(e.response.data);
                 setError(e.response.data.error);
             }
         }
@@ -54,6 +56,7 @@ const PatientInfoPage: React.FC<{ id: string }> = ({id}) => {
     return (
         <div className="App">
             <Container>
+                {error && <Segment inverted color="red">{`Error: ${error}`}</Segment>}
                 <h2>{patient?.name} <Icon name={icon}/></h2>
                 <p>ssn: {patient?.ssn}</p>
                 <p>occupation: {patient?.occupation}</p>
@@ -62,8 +65,35 @@ const PatientInfoPage: React.FC<{ id: string }> = ({id}) => {
                 {patient?.entries.map(entry =>
                     <EntryDetails key={entry.id} entry={entry}/>
                 )}
-                <Field label="Entry type" name="entryType" component={NumberField} min={0} max={2}/> // try to add select for type and render form accordingly
-                <AddEntryForm onSubmit={submitNewEntry} type={}/>
+
+                <Divider/>
+
+                <Grid columns={3} divided>
+                    <Grid.Column>
+                        <Grid.Row>
+                            <Header as="h3">Occupational healthcare entry</Header>
+                        </Grid.Row>
+                        <Grid.Row>
+                            <AddEntryForm onSubmit={submitNewEntry} type={EntryType.OccupationalHealthcare}/>
+                        </Grid.Row>
+                    </Grid.Column>
+                    <Grid.Column>
+                        <Grid.Row>
+                            <Header as="h3">Hospital entry</Header>
+                        </Grid.Row>
+                        <Grid.Row>
+                            <AddEntryForm onSubmit={submitNewEntry} type={EntryType.Hospital}/>
+                        </Grid.Row>
+                    </Grid.Column>
+                    <Grid.Column>
+                        <Grid.Row>
+                            <Header as="h3">Health check entry</Header>
+                        </Grid.Row>
+                        <Grid.Row>
+                            <AddEntryForm onSubmit={submitNewEntry} type={EntryType.HealthCheck}/>
+                        </Grid.Row>
+                    </Grid.Column>
+                </Grid>
             </Container>
         </div>
     );
